@@ -18,8 +18,13 @@ body{
 .canvaswrapper{
        border:1px solid black;
     padding: 10px;
-    display:flex;
+    
     text-align: center;
     justify-content: center;
     flex-direction: column;
+}
+
+.btnwrapper{
+    padding-top: 30px;
+    text-align: center;
 }
