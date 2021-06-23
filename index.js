@@ -113,7 +113,8 @@ let canvasObj = {
     speed: game.gameSpeed,
 
     move: function () {
-        this.y += this.speed;
+        
+        this.y += this.speed
         this.y %= canvas.height;
     },
 
@@ -165,7 +166,8 @@ function newStage() {
 function updateStages() {
     if (stageList.length != 0) {
         stageList.forEach(e => {
-            e.y += e.speed;
+            
+            e.y += e.speed
             ctx.fillStyle = e.color;
             ctx.fillRect(e.x, e.y, e.width, e.height);
 
