@@ -38,7 +38,7 @@ let game = {
     name: 'abc',
     counter: 0,
     gameSpeed: 2.5,
-    lives: 4,
+    lives: 3,
     lifeImg: lives,
     startImg: start,
     running: false,
