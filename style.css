@@ -44,3 +44,10 @@ body{
 #lives{
     display:none;
 }
+#keys {
+    text-align: center;
+    height:120px
+}
+#start{
+    display:none;
+}

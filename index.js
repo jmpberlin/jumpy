@@ -1,6 +1,6 @@
 document.addEventListener('keypress', function (event) {
     if (event.keyCode == 13) {
-        event.preventDefault()
+        run()
     }
     if (event.keyCode == 32) {
         event.preventDefault()
@@ -16,6 +16,7 @@ const banana = document.getElementById('banana');
 const points = document.getElementById('points');
 const beer = document.getElementById('beer');
 const lives = document.getElementById('lives');
+const start = document.getElementById('start')
 
 
 // the canvas
@@ -27,8 +28,11 @@ let counter = 0;
 
 // THE GAME OBJECT  // LEVELS  // POINTS 
 
+// Interval-Id for the start 
+let startIntervalId;
 
 let game = {
+
     level: 0,
     points: 0,
     name: 'abc',
@@ -36,6 +40,7 @@ let game = {
     gameSpeed: 2.5,
     lives: 4,
     lifeImg: lives,
+    startImg: start,
     running: false,
     updatePoints: function () {
         points.innerHTML = `Pooooints: ${this.points}`;
@@ -48,6 +53,54 @@ let game = {
             ctx.drawImage(this.lifeImg, canvas.width - w * (1 + i), 0);
 
         }
+    },
+    displayStart: function () {
+        let x = (canvas.width - this.startImg.width) / 2
+        let y = (canvas.height - this.startImg.height) / 2
+        let w = this.startImg.width;
+        let h = this.startImg.height;
+        let zoom = 0;
+
+        startIntervalId = setInterval(() => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            canvasObj.draw();
+            character.draw();
+            if (zoom < 100) {
+                zoom += 1;
+                x -= 0.05;
+                y -= 0.05;
+                w += 0.1;
+                h += 0.1;
+
+                ctx.drawImage(this.startImg, x, y, w, h)
+            }
+            if (zoom >= 100) {
+                zoom += 1;
+                x += 0.05;
+                y += 0.05;
+                w -= 0.1;
+                h -= 0.1;
+                ctx.drawImage(this.startImg, x, y, w, h)
+                if (zoom === 200) { zoom = 0; }
+            }
+
+
+        }, 1000 / 60);
+    },
+    updateLevel: function () {
+        if (this.points > 100) {
+            this.gameSpeed = 3.5;
+        }
+        if (this.points > 200) {
+            this.gameSpeed = 4.5;
+        }
+        if (this.points > 300) {
+            this.gameSpeed = 5.5;
+        }
+        if (this.points > 400) {
+            this.gameSpeed = 6.5;
+        }
+
     },
     reset: function () {
         this.lives -= 1;
@@ -65,6 +118,8 @@ let game = {
         itemList = [];
         stageList = [];
         character.jumpCounter = 0;
+        counter = 0;
+        character.acceleration = 0.1;
 
 
     }
@@ -136,7 +191,8 @@ let character = {
         }
     },
     moveDown: function () {
-        this.y += this.canvasSpeed;
+
+        this.y += game.gameSpeed;
 
     }
 
@@ -150,11 +206,10 @@ let canvasObj = {
     img: jungle,
     x: 0,
     y: 0,
-    speed: game.gameSpeed,
 
     move: function () {
 
-        this.y += this.speed
+        this.y += game.gameSpeed;
         this.y %= canvas.height;
     },
 
@@ -231,6 +286,7 @@ class Item {
         this.name = name;
         this.imgBanana = banana;
         this.imgBeer = beer;
+        this.imgLives = lives;
         this.x = x;
         this.y = y;
         this.w = w;
@@ -243,13 +299,13 @@ class Item {
 
 function createItems() {
     if (game.counter % 30 === 0 && game.counter > 0) {
-        let randomNum = Math.floor(Math.random() * 10);
+        let randomNum = Math.floor(Math.random() * 100);
         let randomName;
         let randX = Math.floor(Math.random() * canvas.width - 20)
         let y = -10;
-        if (randomNum <= 8) { randomName = 'banana'; itemList.push(new Item(randX, y, 20, 20, randomName)) };
-        if (randomNum > 8) { randomName = 'beer'; itemList.push(new Item(randX, y, 40, 40, randomName)) };
-
+        if (randomNum <= 70) { randomName = 'banana'; itemList.push(new Item(randX, y, 20, 20, randomName)) };
+        if (randomNum > 70 && randomNum < 98) { randomName = 'beer'; itemList.push(new Item(randX, y, 40, 40, randomName)) };
+        if (randomNum > 98) { randomName = 'lives'; itemList.push(new Item(randX, y, 50, 50, randomName)) }
     }
 
 
@@ -269,6 +325,9 @@ function updateItems() {
         }
         if (item.name === 'beer') {
             ctx.drawImage(item.imgBeer, item.x, item.y, item.w, item.h);
+        }
+        if (item.name === 'lives') {
+            ctx.drawImage(item.imgLives, item.x, item.y, item.w, item.h);
         }
         // delete obsolete Items!
         if (item.y > canvas.height) { itemList.splice(itemList.indexOf(item), 1) }
@@ -293,6 +352,10 @@ function collectItems() {
                 if (item.name === 'beer') {
                     game.points += 30;
                     itemList.splice(itemList.indexOf(item), 1)
+                }
+                if (item.name === 'lives') {
+                    itemList.splice(itemList.indexOf(item), 1);
+                    game.lives += 1;
                 }
             }
         }
@@ -366,9 +429,11 @@ function run() {
             updateItems();
             collectItems();
 
-            // display lives 
+            // Game functions = display lives - startInterval - update level
 
+            clearInterval(startIntervalId);
             game.displayLives();
+           // game.updateLevel();
 
             if (character.jumpButton) {
                 character.jump()
@@ -409,6 +474,7 @@ function stop() {
     game.running = false;
     clearInterval(intervalId);
     game.reset();
+
 }
 
 
@@ -427,13 +493,17 @@ document.addEventListener('keydown', event => {
 }
 )
 
-startbtn.addEventListener('click', run)
+
 
 
 // I didnt check out the "onload" function of JS, so I used a timeout to draw the beginning 
 
 let abc = setTimeout(() => { canvasObj.draw() }, 300)
-let def = setTimeout(() => { character.draw(); game.displayLives() }, 300)
+let def = setTimeout(() => {
+    character.draw();
+    game.displayLives();
+    game.displayStart();
+}, 300)
 /*
 window.onload=canvasObj.draw();
 window.onload=character.draw();
