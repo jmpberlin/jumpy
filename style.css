@@ -16,7 +16,7 @@ body{
 }
 
 .canvaswrapper{
-    background-image: url("./images/bg-3.jpg");
+    /*background-image: url("./images/bg-3.jpg");*/
     background-size: cover;
     background-repeat: no-repeat;
     height: 100vh;
@@ -36,5 +36,11 @@ body{
     display:none;
 }
 #banana{
+    display:none;
+}
+#beer{
+    display:none;
+}
+#lives{
     display:none;
 }

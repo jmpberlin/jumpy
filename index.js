@@ -1,10 +1,22 @@
+document.addEventListener('keypress', function (event) {
+    if (event.keyCode == 13) {
+        event.preventDefault()
+    }
+    if (event.keyCode == 32) {
+        event.preventDefault()
+    }
+})
+
+
 
 const jumpy = document.getElementById('character');
 const jungle = document.getElementById('background');
 const startbtn = document.getElementById('startbtn');
-const stopbtn = document.getElementById('stopbtn');
 const banana = document.getElementById('banana');
 const points = document.getElementById('points');
+const beer = document.getElementById('beer');
+const lives = document.getElementById('lives');
+
 
 // the canvas
 const canvas = document.getElementById('canvas');
@@ -22,8 +34,38 @@ let game = {
     name: 'abc',
     counter: 0,
     gameSpeed: 2.5,
-    updatePoints:function (){
-        points.innerHTML=`Pooooints: ${this.points}`;
+    lives: 4,
+    lifeImg: lives,
+    running: false,
+    updatePoints: function () {
+        points.innerHTML = `Pooooints: ${this.points}`;
+
+    },
+    displayLives: function () {
+        let w = this.lifeImg.width;
+        let h = this.lifeImg.height;
+        for (let i = 0; i < this.lives; i++) {
+            ctx.drawImage(this.lifeImg, canvas.width - w * (1 + i), 0);
+
+        }
+    },
+    reset: function () {
+        this.lives -= 1;
+        character.x = (canvas.width / 2) - 25;
+        character.y = canvas.height - 60;
+        character.upSpeed = 15;
+        ctx.clearRect(0, 0, 400, 600);
+        canvasObj.draw();
+        character.draw();
+        this.displayLives();
+        character.stageLandedOnX = undefined;
+        character.stageLandedOnWidth = undefined;
+        character.jumpButton = false;
+        character.downMovement = false;
+        itemList = [];
+        stageList = [];
+        character.jumpCounter = 0;
+
 
     }
 
@@ -44,7 +86,6 @@ let character = {
     canvasSpeed: game.gameSpeed,
     jumpButton: false,
     downMovement: false,
-    fallOff: false,
     stageLandedOnX: undefined,
     stageLandedOnWidth: undefined,
     draw: function () {
@@ -54,7 +95,6 @@ let character = {
         this.stageLandedOnWidth = undefined;
         this.stageLandedOnX = undefined;
         this.downMovement = false;
-        this.fallOff = false;
         this.y -= this.upSpeed;
         this.jumpCounter += 1;
         this.upSpeed -= this.acceleration;
@@ -113,7 +153,7 @@ let canvasObj = {
     speed: game.gameSpeed,
 
     move: function () {
-        
+
         this.y += this.speed
         this.y %= canvas.height;
     },
@@ -132,7 +172,7 @@ let canvasObj = {
 
 // CREATING STAGES  // UPDATING STAGES 
 
-const stageList = [];
+let stageList = [];
 
 class Stage {
     constructor(width, height, x, y, color) {
@@ -166,7 +206,7 @@ function newStage() {
 function updateStages() {
     if (stageList.length != 0) {
         stageList.forEach(e => {
-            
+
             e.y += e.speed
             ctx.fillStyle = e.color;
             ctx.fillRect(e.x, e.y, e.width, e.height);
@@ -187,12 +227,14 @@ function updateStages() {
 let itemList = [];
 
 class Item {
-    constructor(x, y) {
-        this.img = banana;
+    constructor(x, y, w, h, name) {
+        this.name = name;
+        this.imgBanana = banana;
+        this.imgBeer = beer;
         this.x = x;
         this.y = y;
-        this.w = 20;
-        this.h = 20;
+        this.w = w;
+        this.h = h;
         this.speed = game.gameSpeed;
     }
 };
@@ -201,19 +243,33 @@ class Item {
 
 function createItems() {
     if (game.counter % 30 === 0 && game.counter > 0) {
+        let randomNum = Math.floor(Math.random() * 10);
+        let randomName;
         let randX = Math.floor(Math.random() * canvas.width - 20)
         let y = -10;
-        itemList.push(new Item(randX, y))
+        if (randomNum <= 8) { randomName = 'banana'; itemList.push(new Item(randX, y, 20, 20, randomName)) };
+        if (randomNum > 8) { randomName = 'beer'; itemList.push(new Item(randX, y, 40, 40, randomName)) };
 
     }
 
+
 }
+
+
+
 
 function updateItems() {
     for (let i = 0; i < itemList.length; i++) {
+
         let item = itemList[i];
         item.y += item.speed;
-        ctx.drawImage(item.img, item.x, item.y, item.w, item.h);
+        if (item.name === 'banana') {
+
+            ctx.drawImage(item.imgBanana, item.x, item.y, item.w, item.h);
+        }
+        if (item.name === 'beer') {
+            ctx.drawImage(item.imgBeer, item.x, item.y, item.w, item.h);
+        }
         // delete obsolete Items!
         if (item.y > canvas.height) { itemList.splice(itemList.indexOf(item), 1) }
 
@@ -224,16 +280,20 @@ function updateItems() {
 // Check if MOnkey hits the Item
 
 function collectItems() {
-    for (let i=0;i<itemList.length;i++){
-        let item=itemList[i];
+    for (let i = 0; i < itemList.length; i++) {
+        let item = itemList[i];
         // check for the same height
-        if(character.y>=item.y-character.h&&character.y<=item.y+item.h){
+        if (character.y >= item.y - character.h && character.y <= item.y + item.h) {
             // check for the same 'width'
-            if(character.x>=item.x-character.w && character.x<=item.x+item.w){
-                
-                game.points+=10;
-                itemList.splice(itemList.indexOf(item),1)
-
+            if (character.x >= item.x - character.w && character.x <= item.x + item.w) {
+                if (item.name === 'banana') {
+                    game.points += 10;
+                    itemList.splice(itemList.indexOf(item), 1)
+                }
+                if (item.name === 'beer') {
+                    game.points += 30;
+                    itemList.splice(itemList.indexOf(item), 1)
+                }
             }
         }
 
@@ -286,58 +346,69 @@ function checkStages() {
 let intervalId;
 
 function run() {
-    intervalId = setInterval(() => {
+    if (game.running === false) {
+        intervalId = setInterval(() => {
+            //set the status of the game to running!
+            game.running = true;
 
-        ctx.clearRect(0, 0, 400, 600);
-        canvasObj.move();
-        canvasObj.draw();
+            ctx.clearRect(0, 0, 400, 600);
+            canvasObj.move();
+            canvasObj.draw();
 
-        // create and update Stages 
+            // create and update Stages 
 
-        newStage();
-        updateStages();
+            newStage();
+            updateStages();
 
-        // create and update  and collect Bananas
+            // create and update  and collect Bananas
 
-        createItems();
-        updateItems();
-        collectItems();
+            createItems();
+            updateItems();
+            collectItems();
 
-        if (character.jumpButton) {
-            character.jump()
-        };
-        if (character.upSpeed < 0) {
-            character.land();
-        };
-        if (character.downMovement) {
-            character.moveDown();
-        }
-        if (character.stageLandedOnWidth != undefined) {
-            character.fallOffTheEdge()
-            if (checkStages()) { character.stageLandedOnWidth = undefined }
-        }
+            // display lives 
+
+            game.displayLives();
+
+            if (character.jumpButton) {
+                character.jump()
+            };
+            if (character.upSpeed < 0) {
+                character.land();
+            };
+            if (character.downMovement) {
+                character.moveDown();
+            }
+            if (character.stageLandedOnWidth != undefined) {
+                character.fallOffTheEdge()
+                if (checkStages()) { character.stageLandedOnWidth = undefined }
+            }
 
 
 
-        character.draw();
+            character.draw();
 
 
 
-        if (character.y > canvas.height + character.h) {
-            stop();
-        }
+            if (character.y > canvas.height + character.h) {
+                stop()
 
-        game.counter += 1
+            }
 
-        game.updatePoints();
+            game.counter += 1
 
-    }, 1000 / 60);
+            game.updatePoints();
 
+        }, 1000 / 60);
+
+    }
 
 }
 
 function stop() {
+    game.running = false;
     clearInterval(intervalId);
+    game.reset();
 }
 
 
@@ -347,18 +418,22 @@ function stop() {
 document.addEventListener('keydown', event => {
 
     if (event.key === 'ArrowUp') {
-        character.jumpButton = true;
+        if (game.running === true) {
+            character.jumpButton = true;
+        }
     }
-    if (event.key === 'ArrowLeft') { character.moveLeft() }
-    if (event.key === 'ArrowRight') { character.moveRight() }
+    if (event.key === 'ArrowLeft') { if (game.running === true) { character.moveLeft() } }
+    if (event.key === 'ArrowRight') { if (game.running === true) { character.moveRight() } }
 }
 )
 
 startbtn.addEventListener('click', run)
-stopbtn.addEventListener('click', stop)
+
+
+// I didnt check out the "onload" function of JS, so I used a timeout to draw the beginning 
 
 let abc = setTimeout(() => { canvasObj.draw() }, 300)
-let def = setTimeout(() => { character.draw() }, 300)
+let def = setTimeout(() => { character.draw(); game.displayLives() }, 300)
 /*
 window.onload=canvasObj.draw();
 window.onload=character.draw();
