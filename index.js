@@ -1,11 +1,3 @@
-document.addEventListener('keypress', function (event) {
-    if (event.keyCode == 13) {
-        run()
-    }
-    if (event.keyCode == 32) {
-        event.preventDefault()
-    }
-})
 
 
 
@@ -16,7 +8,11 @@ const banana = document.getElementById('banana');
 const points = document.getElementById('points');
 const beer = document.getElementById('beer');
 const lives = document.getElementById('lives');
-const start = document.getElementById('start')
+const start = document.getElementById('start');
+const countdown1 = document.getElementById('countdown1');
+const countdown2 = document.getElementById('countdown2');
+const countdown3 = document.getElementById('countdown3');
+const jump = document.getElementById('jump');
 
 
 // the canvas
@@ -31,6 +27,7 @@ let counter = 0;
 // Interval-Id for the start 
 let startIntervalId;
 
+
 let game = {
 
     level: 0,
@@ -41,11 +38,59 @@ let game = {
     lives: 3,
     lifeImg: lives,
     startImg: start,
+    cdImg1: countdown1,
+    cdImg2: countdown2,
+    cdImg3: countdown3,
+    cdImg0: jump,
+    countdownY3: 0 - countdown3.height*2,
+    countdownY2: 0 - (countdown2.height * 6),
+    countdownY1: 0 - (countdown1.height * 8.5),
+    countdownY0: 0 - (countdown1.height * 12),
     running: false,
     updatePoints: function () {
-        points.innerHTML = `Pooooints: ${this.points}`;
+        points.innerHTML = `Points: ${this.points}`;
 
     },
+    displayCountdown: function () {
+
+        if (this.countdownY0 < canvas.height) {
+            this.countdownY1 += 12;
+            ctx.drawImage(this.cdImg3, canvas.width / 2 - (this.cdImg1.width / 2), this.countdownY3);
+            this.countdownY2 += 12;
+            ctx.drawImage(this.cdImg2, canvas.width / 2 - (this.cdImg1.width / 2), this.countdownY2);
+            this.countdownY3 += 12;
+            ctx.drawImage(this.cdImg1, canvas.width / 2 - (this.cdImg1.width / 2), this.countdownY1);
+            this.countdownY0 += 12;
+            ctx.drawImage(this.cdImg0, canvas.width / 2 - (this.cdImg0.width / 2), this.countdownY0);
+        }
+    },
+
+    checkForActions: function () {
+
+        setTimeout(() => {
+
+            if (character.x === (canvas.width / 2) - 25 && character.y === canvas.height - 60) {
+                this.countdownY0 = -180
+
+
+
+            }
+
+
+
+        }, 6000)
+        setTimeout(() => {
+
+            if (character.x === (canvas.width / 2) - 25 && character.y === canvas.height - 60) {
+                stop();
+
+            }
+
+
+
+        }, 10000)
+    },
+
     displayLives: function () {
         let w = this.lifeImg.width;
         let h = this.lifeImg.height;
@@ -65,6 +110,7 @@ let game = {
             ctx.clearRect(0, 0, canvas.width, canvas.height)
             canvasObj.draw();
             character.draw();
+            game.displayLives();
             if (zoom < 100) {
                 zoom += 1;
                 x -= 0.05;
@@ -110,7 +156,6 @@ let game = {
         ctx.clearRect(0, 0, 400, 600);
         canvasObj.draw();
         character.draw();
-        this.displayLives();
         character.stageLandedOnX = undefined;
         character.stageLandedOnWidth = undefined;
         character.jumpButton = false;
@@ -120,6 +165,11 @@ let game = {
         character.jumpCounter = 0;
         counter = 0;
         character.acceleration = 0.1;
+        this.countdownY3 = 0 - countdown3.height*2;
+        this.countdownY2 = 0 - (countdown2.height * 6);
+        this.countdownY1 = 0 - (countdown1.height * 8.5);
+        this.countdownY0 = 0 - (countdown1.height * 12);
+
 
 
     }
@@ -195,7 +245,6 @@ let character = {
         this.y += game.gameSpeed;
 
     }
-
 
 }
 
@@ -433,7 +482,8 @@ function run() {
 
             clearInterval(startIntervalId);
             game.displayLives();
-           // game.updateLevel();
+            game.displayCountdown();
+            // game.updateLevel();
 
             if (character.jumpButton) {
                 character.jump()
@@ -456,7 +506,9 @@ function run() {
 
 
             if (character.y > canvas.height + character.h) {
-                stop()
+                stop();
+
+
 
             }
 
@@ -474,6 +526,9 @@ function stop() {
     game.running = false;
     clearInterval(intervalId);
     game.reset();
+    game.displayLives();
+    game.displayStart();
+
 
 }
 
@@ -491,21 +546,28 @@ document.addEventListener('keydown', event => {
     if (event.key === 'ArrowLeft') { if (game.running === true) { character.moveLeft() } }
     if (event.key === 'ArrowRight') { if (game.running === true) { character.moveRight() } }
 }
-)
+);
+
+document.addEventListener('keypress', function (event) {
+    if (event.keyCode == 13) {
+        run();
+        game.checkForActions();
+    }
+    if (event.keyCode == 32) {
+        event.preventDefault()
+    }
+})
+
 
 
 
 
 // I didnt check out the "onload" function of JS, so I used a timeout to draw the beginning 
 
-let abc = setTimeout(() => { canvasObj.draw() }, 300)
 let def = setTimeout(() => {
+    canvasObj.draw()
+    game.displayStart();
     character.draw();
     game.displayLives();
-    game.displayStart();
-}, 300)
-/*
-window.onload=canvasObj.draw();
-window.onload=character.draw();
 
- */
+}, 300)
