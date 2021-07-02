@@ -6,6 +6,7 @@ const jungle = document.getElementById('background');
 const startbtn = document.getElementById('startbtn');
 const banana = document.getElementById('banana');
 const points = document.getElementById('points');
+const level = document.getElementById('level');
 const beer = document.getElementById('beer');
 const lives = document.getElementById('lives');
 const start = document.getElementById('start');
@@ -30,10 +31,15 @@ let startIntervalId;
 
 let game = {
 
-    level: 0,
+    level: 1,
+    levelSpeed: 19,  /// BEEN WORKING ON CHANGING THE JUMPING SPEED BY REFERENCING A GAME "LEVELSPEED"!
+    levelAccileration: 0.4,
+    levelStageModulo: 40,
+    drunkness: 0,
     points: 0,
     name: 'abc',
     counter: 0,
+    timeOutCounter: 0,
     gameSpeed: 2.5,
     lives: 3,
     lifeImg: lives,
@@ -42,7 +48,7 @@ let game = {
     cdImg2: countdown2,
     cdImg3: countdown3,
     cdImg0: jump,
-    countdownY3: 0 - countdown3.height*2,
+    countdownY3: 0 - countdown3.height * 2,
     countdownY2: 0 - (countdown2.height * 6),
     countdownY1: 0 - (countdown1.height * 8.5),
     countdownY0: 0 - (countdown1.height * 12),
@@ -66,29 +72,29 @@ let game = {
     },
 
     checkForActions: function () {
+        this.timeOutCounter += 1;
+        if (this.timeOutCounter === 360) {
+            console.log('first if called')
 
-        setTimeout(() => {
-
-            if (character.x === (canvas.width / 2) - 25 && character.y === canvas.height - 60) {
+            if (character.y === canvas.height - 60) {
                 this.countdownY0 = -180
 
 
 
             }
+        }
 
 
 
-        }, 6000)
-        setTimeout(() => {
-
-            if (character.x === (canvas.width / 2) - 25 && character.y === canvas.height - 60) {
+        if (this.timeOutCounter === 600) {
+            console.log('second if called')
+            if (character.y === canvas.height - 60) {
                 stop();
 
             }
+        }
 
 
-
-        }, 10000)
     },
 
     displayLives: function () {
@@ -135,16 +141,31 @@ let game = {
     },
     updateLevel: function () {
         if (this.points > 100) {
-            this.gameSpeed = 3.5;
+            this.gameSpeed = 3.0;
+            this.levelSpeed = 21;
+            this.levelAccileration = 0.5;
+            this.level = 2;
+
         }
         if (this.points > 200) {
-            this.gameSpeed = 4.5;
+            this.gameSpeed = 3.5;
+            this.levelSpeed = 21;
+            this.levelAccileration = 0.6;
+            this.level = 3;
         }
         if (this.points > 300) {
-            this.gameSpeed = 5.5;
+            this.gameSpeed = 4.5;
+            this.levelSpeed = 23;
+            this.levelAccileration = 0.7;
+            this.levelStageModulo = 35;
+            this.level = 4;
         }
         if (this.points > 400) {
-            this.gameSpeed = 6.5;
+            this.gameSpeed = 5.5;
+            this.levelSpeed = 24;
+            this.levelAccileration = 0.9;
+            this.levelStageModulo = 25;
+            this.level = 5;
         }
 
     },
@@ -152,7 +173,7 @@ let game = {
         this.lives -= 1;
         character.x = (canvas.width / 2) - 25;
         character.y = canvas.height - 60;
-        character.upSpeed = 15;
+        character.upSpeed = game.levelSpeed;
         ctx.clearRect(0, 0, 400, 600);
         canvasObj.draw();
         character.draw();
@@ -164,12 +185,17 @@ let game = {
         stageList = [];
         character.jumpCounter = 0;
         counter = 0;
-        character.acceleration = 0.1;
-        this.countdownY3 = 0 - countdown3.height*2;
+        character.acceleration = 0.7;
+        this.countdownY3 = 0 - countdown3.height * 2;
         this.countdownY2 = 0 - (countdown2.height * 6);
         this.countdownY1 = 0 - (countdown1.height * 8.5);
         this.countdownY0 = 0 - (countdown1.height * 12);
+        this.timeOutCounter = 0;
 
+
+    },
+    displayLevel: function () {
+        level.innerHTML = `Level ${this.level}`;
 
 
     }
@@ -186,8 +212,8 @@ let character = {
     x: (canvas.width / 2) - 25,
     y: canvas.height - 60,
     jumpCounter: 0,
-    acceleration: 0.1,
-    upSpeed: 15,
+    acceleration: 0.7,
+    upSpeed: game.levelSpeed,
     canvasSpeed: game.gameSpeed,
     jumpButton: false,
     downMovement: false,
@@ -200,10 +226,31 @@ let character = {
         this.stageLandedOnWidth = undefined;
         this.stageLandedOnX = undefined;
         this.downMovement = false;
+        if (this.y - this.upSpeed <= 0) {
+            this.upSpeed = -0.1;
+            //this.acceleration *= 1.5;
+
+        }
         this.y -= this.upSpeed;
         this.jumpCounter += 1;
         this.upSpeed -= this.acceleration;
-        if (this.jumpCounter % 8 === 0) { this.acceleration += 0.05 };
+        if (this.jumpCounter % 7 === 0) {
+            this.acceleration += 0.05
+        };
+        if (game.drunkenRandomizer < 5 && this.x + game.drunkness < canvas.width - character.w) {
+            if (this.x + game.drunkness < canvas.width - character.w) {
+
+                this.x += (game.drunkness / 20);
+            }
+
+        }
+        if (game.drunkenRandomizer > 5 && this.x + game.drunkness < canvas.width - character.w) {
+            if (this.x-game.drunkness>0 ) {
+
+                this.x -= (game.drunkness / 20);
+            }
+
+        }
 
     },
     land: function () {
@@ -211,8 +258,8 @@ let character = {
 
             this.jumpButton = false;
             this.jumpCounter = 0;
-            this.acceleration = 0.1;
-            this.upSpeed = 10;
+            this.acceleration = 0.7;
+            this.upSpeed = game.levelSpeed;
             this.downMovement = true;
 
         }
@@ -285,13 +332,13 @@ class Stage {
         this.x = x;
         this.y = y;
         this.color = color;
-        this.speed = game.gameSpeed;
+        // this.speed = game.gameSpeed;
     }
 };
 
 function newStage() {
 
-    if (game.counter % 40 === 0) {
+    if (game.counter % game.levelStageModulo === 0) {
         let minWidth = 80;
         let maxWidth = 180;
         let x = Math.floor(Math.random() * (canvas.width - minWidth));
@@ -311,7 +358,7 @@ function updateStages() {
     if (stageList.length != 0) {
         stageList.forEach(e => {
 
-            e.y += e.speed
+            e.y += game.gameSpeed;
             ctx.fillStyle = e.color;
             ctx.fillRect(e.x, e.y, e.width, e.height);
 
@@ -340,7 +387,7 @@ class Item {
         this.y = y;
         this.w = w;
         this.h = h;
-        this.speed = game.gameSpeed;
+
     }
 };
 
@@ -367,7 +414,7 @@ function updateItems() {
     for (let i = 0; i < itemList.length; i++) {
 
         let item = itemList[i];
-        item.y += item.speed;
+        item.y += game.gameSpeed;
         if (item.name === 'banana') {
 
             ctx.drawImage(item.imgBanana, item.x, item.y, item.w, item.h);
@@ -400,6 +447,7 @@ function collectItems() {
                 }
                 if (item.name === 'beer') {
                     game.points += 30;
+                    game.drunkness += 1;
                     itemList.splice(itemList.indexOf(item), 1)
                 }
                 if (item.name === 'lives') {
@@ -460,6 +508,8 @@ let intervalId;
 function run() {
     if (game.running === false) {
         intervalId = setInterval(() => {
+            clearInterval(startIntervalId);
+
             //set the status of the game to running!
             game.running = true;
 
@@ -480,10 +530,12 @@ function run() {
 
             // Game functions = display lives - startInterval - update level
 
-            clearInterval(startIntervalId);
+
             game.displayLives();
+            game.displayLevel();
             game.displayCountdown();
-            // game.updateLevel();
+            game.updateLevel();
+            game.checkForActions();
 
             if (character.jumpButton) {
                 character.jump()
@@ -541,6 +593,7 @@ document.addEventListener('keydown', event => {
     if (event.key === 'ArrowUp') {
         if (game.running === true) {
             character.jumpButton = true;
+            game.drunkenRandomizer = Math.floor(Math.random() * 10);
         }
     }
     if (event.key === 'ArrowLeft') { if (game.running === true) { character.moveLeft() } }
@@ -551,7 +604,7 @@ document.addEventListener('keydown', event => {
 document.addEventListener('keypress', function (event) {
     if (event.keyCode == 13) {
         run();
-        game.checkForActions();
+
     }
     if (event.keyCode == 32) {
         event.preventDefault()
