@@ -178,27 +178,27 @@ let game = {
     },
 
     updateLevel: function () {
-        if (this.points > 100) {
+        if (this.points > 250) {
             this.gameSpeed = 3.0;
             this.levelSpeed = 21;
             this.levelAccileration = 0.5;
             this.level = 2;
 
         }
-        if (this.points > 200) {
+        if (this.points > 400) {
             this.gameSpeed = 3.5;
             this.levelSpeed = 21;
             this.levelAccileration = 0.6;
             this.level = 3;
         }
-        if (this.points > 300) {
+        if (this.points > 550) {
             this.gameSpeed = 4.5;
             this.levelSpeed = 23;
             this.levelAccileration = 0.7;
             this.levelStageModulo = 35;
             this.level = 4;
         }
-        if (this.points > 400) {
+        if (this.points > 650) {
             this.gameSpeed = 5.5;
             this.levelSpeed = 24;
             this.levelAccileration = 0.9;
