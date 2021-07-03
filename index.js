@@ -14,6 +14,7 @@ const countdown1 = document.getElementById('countdown1');
 const countdown2 = document.getElementById('countdown2');
 const countdown3 = document.getElementById('countdown3');
 const jump = document.getElementById('jump');
+const gameover = document.getElementById('gameover')
 
 
 // the canvas
@@ -25,9 +26,9 @@ let counter = 0;
 
 // THE GAME OBJECT  // LEVELS  // POINTS 
 
-// Interval-Id for the start 
+// Interval-Id for the start / end
 let startIntervalId;
-
+let endIntervalId;
 
 let game = {
 
@@ -52,6 +53,8 @@ let game = {
     countdownY2: 0 - (countdown2.height * 6),
     countdownY1: 0 - (countdown1.height * 8.5),
     countdownY0: 0 - (countdown1.height * 12),
+    gameoverImg: gameover,
+    gameoverStatus: false,
     running: false,
     updatePoints: function () {
         points.innerHTML = `Points: ${this.points}`;
@@ -139,6 +142,41 @@ let game = {
 
         }, 1000 / 60);
     },
+    displayEnd: function () {
+
+        if (this.lives < 1) {
+            let x = 0;
+            let y = 0;
+            let vertical = 0.3;
+            let horizontal = 0.2;
+            game.running = false;
+            game.gameoverStatus=true;
+            clearInterval(intervalId);
+            endIntervalId = setInterval(() => {
+                x += horizontal;
+                y += vertical;
+                ctx.clearRect(0, 0, canvas.width, canvas.height)
+                ctx.drawImage(this.gameoverImg, x, y);
+                if (x > canvas.width - this.gameoverImg.width) {
+                    horizontal = -0.2
+                }
+                if (y > canvas.height - this.gameoverImg.height) {
+                    vertical = -0.3
+                }
+                if (x < 0) {
+                    horizontal = 0.2
+                }
+                if (y < 0) {
+                    vertical = 0.3
+                }
+
+
+
+
+            })
+        }
+    },
+
     updateLevel: function () {
         if (this.points > 100) {
             this.gameSpeed = 3.0;
@@ -191,6 +229,7 @@ let game = {
         this.countdownY1 = 0 - (countdown1.height * 8.5);
         this.countdownY0 = 0 - (countdown1.height * 12);
         this.timeOutCounter = 0;
+        this.gameoverStatus = false;
 
 
     },
@@ -245,7 +284,7 @@ let character = {
 
         }
         if (game.drunkenRandomizer > 5 && this.x + game.drunkness < canvas.width - character.w) {
-            if (this.x-game.drunkness>0 ) {
+            if (this.x - game.drunkness > 0) {
 
                 this.x -= (game.drunkness / 20);
             }
@@ -534,6 +573,7 @@ function run() {
             game.displayLives();
             game.displayLevel();
             game.displayCountdown();
+
             game.updateLevel();
             game.checkForActions();
 
@@ -562,6 +602,7 @@ function run() {
 
 
 
+
             }
 
             game.counter += 1
@@ -579,7 +620,9 @@ function stop() {
     clearInterval(intervalId);
     game.reset();
     game.displayLives();
-    game.displayStart();
+    game.displayEnd();
+    if (game.lives > 0) { game.displayStart(); }
+
 
 
 }
@@ -603,7 +646,8 @@ document.addEventListener('keydown', event => {
 
 document.addEventListener('keypress', function (event) {
     if (event.keyCode == 13) {
-        run();
+        if(game.gameoverStatus===false){
+        run();}
 
     }
     if (event.keyCode == 32) {
