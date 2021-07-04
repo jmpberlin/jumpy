@@ -32,37 +32,11 @@ body{
     padding-top: 30px;
     text-align: center;
 }
-#background{
+#background,#banana,#beer,#lives,#start,#countdown1,#countdown2,#countdown3,#jump,#gameover,#stage1,#stage2,#stage3{
     display:none;
 }
-#banana{
-    display:none;
-}
-#beer{
-    display:none;
-}
-#lives{
-    display:none;
-}
+
 #keys {
     text-align: center;
     height:120px
-}
-#start{
-    display:none;
-}
-#countdown1{
-    display:none;
-}
-#countdown2{
-    display:none;
-}
-#countdown3{
-    display:none;
-}
-#jump{
-    display:none;
-}
-#gameover{
-    display:none;
 }

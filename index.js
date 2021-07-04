@@ -15,6 +15,9 @@ const countdown2 = document.getElementById('countdown2');
 const countdown3 = document.getElementById('countdown3');
 const jump = document.getElementById('jump');
 const gameover = document.getElementById('gameover')
+const stage1 = document.getElementById('stage1')
+const stage2 = document.getElementById('stage2')
+const stage3 = document.getElementById('stage3')
 
 
 // the canvas
@@ -150,12 +153,13 @@ let game = {
             let vertical = 0.3;
             let horizontal = 0.2;
             game.running = false;
-            game.gameoverStatus=true;
+            game.gameoverStatus = true;
             clearInterval(intervalId);
             endIntervalId = setInterval(() => {
                 x += horizontal;
                 y += vertical;
                 ctx.clearRect(0, 0, canvas.width, canvas.height)
+                ctx.drawImage(jungle, 0, 0)
                 ctx.drawImage(this.gameoverImg, x, y);
                 if (x > canvas.width - this.gameoverImg.width) {
                     horizontal = -0.2
@@ -410,6 +414,80 @@ function updateStages() {
     }
 }
 
+// CREATING Trees  // UPDATING Trees! 
+
+let treeList = [];
+
+class Tree {
+    constructor(width, height, x, y, random) {
+        this.width = width;
+        this.height = height;
+        this.x = x;
+        this.y = y;
+        this.random = random;
+
+    }
+};
+
+
+function newTree() {
+
+    if (game.counter % game.levelStageModulo === 0) {
+        let minWidth = 80;
+        let maxWidth = 180;
+        let x = Math.floor(Math.random() * (canvas.width - minWidth));
+        let y = -15;
+        let width;
+        let height = 25;
+        let randomNum = Math.floor(Math.random() * 100)
+        let random;
+
+        if (randomNum < 33) {
+            random = 1;
+            width = stage1.width;
+        }
+        if (randomNum > 33 && randomNum < 66) {
+            random = 2;
+            width = stage2.width;
+        }
+        if (randomNum > 66) {
+            random = 3;
+            width = stage3.width;
+        }
+
+
+
+        treeList.push(new Tree(width, height, x, y, random))
+        
+
+    }
+}
+
+function updateTrees() {
+    if (treeList.length != 0) {
+        treeList.forEach(e => {
+
+            e.y += game.gameSpeed;
+            if (e.random === 1) {
+                ctx.drawImage(stage1,e.x, e.y);
+            }
+            if (e.random === 2) {
+                ctx.drawImage(stage2,e.x, e.y);
+            }
+            if (e.random === 3) {
+                ctx.drawImage(stage3,e.x, e.y);
+            }
+            if (e.y > canvas.height) {
+                treeList.splice(0, 1);
+
+            }
+
+        })
+    }
+
+
+};
+
 
 // CREATING ITEMS 
 
@@ -561,6 +639,13 @@ function run() {
             newStage();
             updateStages();
 
+
+            /// NEW STAGE // TREE FUNCTION _ NOT YET WORKING
+
+
+            newTree();
+            updateTrees();
+
             // create and update  and collect Bananas
 
             createItems();
@@ -646,8 +731,9 @@ document.addEventListener('keydown', event => {
 
 document.addEventListener('keypress', function (event) {
     if (event.keyCode == 13) {
-        if(game.gameoverStatus===false){
-        run();}
+        if (game.gameoverStatus === false) {
+            run();
+        }
 
     }
     if (event.keyCode == 32) {
