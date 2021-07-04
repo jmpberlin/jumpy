@@ -225,6 +225,7 @@ let game = {
         character.downMovement = false;
         itemList = [];
         stageList = [];
+        treeList = [];
         character.jumpCounter = 0;
         counter = 0;
         character.acceleration = 0.7;
@@ -458,7 +459,7 @@ function newTree() {
 
 
         treeList.push(new Tree(width, height, x, y, random))
-        
+
 
     }
 }
@@ -469,13 +470,13 @@ function updateTrees() {
 
             e.y += game.gameSpeed;
             if (e.random === 1) {
-                ctx.drawImage(stage1,e.x, e.y);
+                ctx.drawImage(stage1, e.x, e.y);
             }
             if (e.random === 2) {
-                ctx.drawImage(stage2,e.x, e.y);
+                ctx.drawImage(stage2, e.x, e.y);
             }
             if (e.random === 3) {
-                ctx.drawImage(stage3,e.x, e.y);
+                ctx.drawImage(stage3, e.x, e.y);
             }
             if (e.y > canvas.height) {
                 treeList.splice(0, 1);
@@ -580,8 +581,10 @@ function collectItems() {
 }
 
 
-// CHECK IF MONKEY HAS LANDED
+// CHECK IF MONKEY HAS LANDED //  OLD VERSION - DELETE IF NOT NECESSARY ANY MORE! 
 
+
+/*
 function checkStages() {
 
     let jumpyX = character.x;
@@ -613,7 +616,43 @@ function checkStages() {
 
 };
 
+*/
 
+
+
+// CHECK IF MONKEY HAS LANDED ON A TREE-- old version above 
+
+
+function checkStages() {
+
+    let jumpyX = character.x;
+    let jumpyY = character.y + character.h;
+
+
+    for (let i = 0; i < treeList.length; i++) {
+        let stage = treeList[i];
+        let stageWidth = stage.width;
+        let stageX = stage.x;
+        let stageY = stage.y;
+        // check if stage and character are at the same height
+        if (jumpyY - character.upSpeed > stageY && jumpyY < stageY) {
+
+            // check left corner of character with right corner of stage
+            if (jumpyX <= stageX + (stage.width - 15) && (jumpyX + character.w) > (stageX + 15)) {
+                character.y = stage.y - character.h;
+                character.stageLandedOnX = treeList[i].x;
+                character.stageLandedOnWidth = treeList[i].x + treeList[i].width;
+                game.points += 1;
+
+                return true;
+            } // check right vorner of character with left corner of stage
+
+        };
+
+    }
+    return false
+
+};
 
 
 
@@ -634,13 +673,13 @@ function run() {
             canvasObj.move();
             canvasObj.draw();
 
-            // create and update Stages 
+            // create and update Stages - Old version - delete if not necessary any more! 
 
-            newStage();
-            updateStages();
+            // newStage();
+            //  updateStages();
 
 
-            /// NEW STAGE // TREE FUNCTION _ NOT YET WORKING
+            /// create and update treeSTAGES
 
 
             newTree();
