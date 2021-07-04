@@ -14,10 +14,15 @@ const countdown1 = document.getElementById('countdown1');
 const countdown2 = document.getElementById('countdown2');
 const countdown3 = document.getElementById('countdown3');
 const jump = document.getElementById('jump');
-const gameover = document.getElementById('gameover')
-const stage1 = document.getElementById('stage1')
-const stage2 = document.getElementById('stage2')
-const stage3 = document.getElementById('stage3')
+const gameover = document.getElementById('gameover');
+const stage1 = document.getElementById('stage1');
+const stage2 = document.getElementById('stage2');
+const stage3 = document.getElementById('stage3');
+const snake1 = document.getElementById('snake1');
+const snake2 = document.getElementById('snake2');
+const snake3 = document.getElementById('snake3');
+const snake4 = document.getElementById('snake4');
+const snake5 = document.getElementById('snake5');
 
 
 // the canvas
@@ -235,6 +240,7 @@ let game = {
         this.countdownY0 = 0 - (countdown1.height * 12);
         this.timeOutCounter = 0;
         this.gameoverStatus = false;
+        snakes.snakeList=[];
 
 
     },
@@ -365,8 +371,87 @@ let canvasObj = {
 
 
 
-// CREATING STAGES  // UPDATING STAGES 
+// SNAKE OBJECT -
 
+class Snake {
+    constructor(width, height, x, y, random) {
+        this.width = width;
+        this.height = height;
+        this.x = x;
+        this.y = y;
+
+
+    }
+};
+
+let snakes = {
+    snakeList: [],
+    snakeCounter: 0,
+    movementCounter: 0,
+    snakeImg1: snake1,
+    snakeImg2: snake2,
+    snakeImg3: snake3,
+    snakeImg4: snake4,
+    snakeImg5: snake5,
+    createSnake: function () {
+        this.snakeCounter += 1;
+        if (this.snakeCounter % (game.levelStageModulo * 12) === 0) {
+            let stage = treeList[treeList.length - 1]
+            let width = snake1.width;
+            let height = snake1.height;
+            let y = stage.y - snake1.height;
+            let x = stage.x;
+            this.snakeList.push(new Snake(width, height, x, y))
+            console.log(snakes.snakeList)
+        }
+    },
+    updateSnakes: function () {
+        if (this.snakeList.length != 0) {
+            this.snakeList.forEach(e => {
+                this.movementCounter += 1;
+                let c = this.movementCounter;
+                e.y += game.gameSpeed;
+                if (c < 80) {
+                    ctx.drawImage(snake1, e.x, e.y)
+                }
+                if(c>=80&&c<83){
+                    ctx.drawImage(snake2, e.x, e.y)
+
+                }
+                if(c>=83&&c<86){
+                    ctx.drawImage(snake3, e.x, e.y)
+
+                }
+                if(c>=86&&c<99){
+                    ctx.drawImage(snake4, e.x, e.y)
+
+                }
+                
+                if(c>=89&&c<92){
+                    ctx.drawImage(snake5, e.x, e.y)
+
+                }
+                if(c>92){
+                    this.movementCounter=0;
+                }
+
+                if (e.y > canvas.height) {
+                    this.snakeList.splice(0, 1);
+
+                }
+
+            })
+        }
+
+    },
+    checkForSnakeBites:function(){
+
+    }
+}
+
+
+// CREATING STAGES  // UPDATING STAGES  -- OBSOLETE - DELETE LATER!
+/*
 let stageList = [];
 
 class Stage {
@@ -380,7 +465,7 @@ class Stage {
     }
 };
 
-function newStage() {
+function newStage() {                  // -- OBSOLETE - DELETE LATER!
 
     if (game.counter % game.levelStageModulo === 0) {
         let minWidth = 80;
@@ -397,7 +482,7 @@ function newStage() {
     }
 }
 
-// MOVE THE STAGES AND REMOVE THE INVISIBLE ONES
+// MOVE THE STAGES AND REMOVE THE INVISIBLE ONES  // -- OBSOLETE - DELETE LATER!
 function updateStages() {
     if (stageList.length != 0) {
         stageList.forEach(e => {
@@ -414,6 +499,10 @@ function updateStages() {
         })
     }
 }
+
+*/
+
+
 
 // CREATING Trees  // UPDATING Trees! 
 
@@ -437,7 +526,7 @@ function newTree() {
         let minWidth = 80;
         let maxWidth = 180;
         let x = Math.floor(Math.random() * (canvas.width - minWidth));
-        let y = -15;
+        let y = -115;
         let width;
         let height = 25;
         let randomNum = Math.floor(Math.random() * 100)
@@ -581,8 +670,7 @@ function collectItems() {
 }
 
 
-// CHECK IF MONKEY HAS LANDED //  OLD VERSION - DELETE IF NOT NECESSARY ANY MORE! 
-
+// CHECK IF MONKEY HAS LANDED //  OLD VERSION - DELETE IF NOT NECESSARY ANY MORE!
 
 /*
 function checkStages() {
@@ -620,7 +708,7 @@ function checkStages() {
 
 
 
-// CHECK IF MONKEY HAS LANDED ON A TREE-- old version above 
+// CHECK IF MONKEY HAS LANDED ON A TREE (NEW VERSION) -- old version above 
 
 
 function checkStages() {
@@ -673,7 +761,7 @@ function run() {
             canvasObj.move();
             canvasObj.draw();
 
-            // create and update Stages - Old version - delete if not necessary any more! 
+            // create and update Stages - OBSOLETE - delete later!
 
             // newStage();
             //  updateStages();
@@ -684,6 +772,12 @@ function run() {
 
             newTree();
             updateTrees();
+
+            // Create and update the SNAKES
+
+            snakes.createSnake();
+            snakes.updateSnakes();
+            snakes.checkForSnakeBites();
 
             // create and update  and collect Bananas
 

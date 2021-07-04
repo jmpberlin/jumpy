@@ -16,7 +16,7 @@ body{
 }
 
 .canvaswrapper{
-    /*background-image: url("./images/bg-3.jpg");*/
+    background-image: url("./images/bg.png");
     background-size: cover;
     background-repeat: no-repeat;
     height: 100vh;
@@ -39,4 +39,8 @@ body{
 #keys {
     text-align: center;
     height:120px
+}
+
+#snake1,#snake2,#snake3,#snake4,#snake5{
+    display:none;
 }
