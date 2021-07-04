@@ -43,7 +43,7 @@ let game = {
     level: 1,
     levelSpeed: 19,  /// BEEN WORKING ON CHANGING THE JUMPING SPEED BY REFERENCING A GAME "LEVELSPEED"!
     levelAccileration: 0.4,
-    levelStageModulo: 40,
+    levelStageModulo: 35,
     drunkness: 0,
     points: 0,
     name: 'abc',
@@ -51,6 +51,7 @@ let game = {
     timeOutCounter: 0,
     gameSpeed: 2.5,
     lives: 3,
+    ep: 100,
     lifeImg: lives,
     startImg: start,
     cdImg1: countdown1,
@@ -85,7 +86,7 @@ let game = {
     checkForActions: function () {
         this.timeOutCounter += 1;
         if (this.timeOutCounter === 360) {
-            console.log('first if called')
+
 
             if (character.y === canvas.height - 60) {
                 this.countdownY0 = -180
@@ -98,7 +99,7 @@ let game = {
 
 
         if (this.timeOutCounter === 600) {
-            console.log('second if called')
+
             if (character.y === canvas.height - 60) {
                 stop();
 
@@ -204,14 +205,14 @@ let game = {
             this.gameSpeed = 4.5;
             this.levelSpeed = 23;
             this.levelAccileration = 0.7;
-            this.levelStageModulo = 35;
+            this.levelStageModulo = 28;
             this.level = 4;
         }
         if (this.points > 650) {
             this.gameSpeed = 5.5;
             this.levelSpeed = 24;
             this.levelAccileration = 0.9;
-            this.levelStageModulo = 25;
+            this.levelStageModulo = 15;
             this.level = 5;
         }
 
@@ -240,13 +241,24 @@ let game = {
         this.countdownY0 = 0 - (countdown1.height * 12);
         this.timeOutCounter = 0;
         this.gameoverStatus = false;
-        snakes.snakeList=[];
+        snakes.snakeList = [];
+        snakes.snakeCounter = 0;
+        this.ep=100;
 
 
     },
     displayLevel: function () {
         level.innerHTML = `Level ${this.level}`;
 
+
+    },
+    displayEp: function () {
+        let ep = game.ep;
+        ctx.fillStyle = 'black';
+        ctx.fillRect(10, 10, 102, 12)
+        ctx.clearRect(11, 11, 100, 10)
+        ctx.fillStyle = '#FFEB00';
+        ctx.fillRect(11, 11, ep, 10)
 
     }
 
@@ -402,7 +414,7 @@ let snakes = {
             let y = stage.y - snake1.height;
             let x = stage.x;
             this.snakeList.push(new Snake(width, height, x, y))
-            console.log(snakes.snakeList)
+
         }
     },
     updateSnakes: function () {
@@ -414,25 +426,25 @@ let snakes = {
                 if (c < 80) {
                     ctx.drawImage(snake1, e.x, e.y)
                 }
-                if(c>=80&&c<83){
+                if (c >= 80 && c < 83) {
                     ctx.drawImage(snake2, e.x, e.y)
 
                 }
-                if(c>=83&&c<86){
+                if (c >= 83 && c < 86) {
                     ctx.drawImage(snake3, e.x, e.y)
 
                 }
-                if(c>=86&&c<99){
+                if (c >= 86 && c < 99) {
                     ctx.drawImage(snake4, e.x, e.y)
 
                 }
-                
-                if(c>=89&&c<92){
+
+                if (c >= 89 && c < 92) {
                     ctx.drawImage(snake5, e.x, e.y)
 
                 }
-                if(c>92){
-                    this.movementCounter=0;
+                if (c > 92) {
+                    this.movementCounter = 0;
                 }
 
                 if (e.y > canvas.height) {
@@ -444,7 +456,40 @@ let snakes = {
         }
 
     },
-    checkForSnakeBites:function(){
+    checkForSnakeBites: function () {
+
+        for (let i = 0; i < this.snakeList.length; i++) {
+            let snake = this.snakeList[i];
+            let snakeY = snake.y;
+            let snakeX = snake.x;
+            let characterX = character.x;
+            let characterY = character.y + character.h
+            let c = this.movementCounter;
+            // CHECK FOR THE SAME HEIGHT
+            if (characterY >= snake.y && characterY < snakeY + snake.height + character.h) {
+                // CHECK FOR THE "RESTING"-SNAKE ( FRAME 1 )
+                if (c < 80) {
+                    // CHECK FOR THE SAME HORIZONTAL POSITION 
+                    if (characterX > snakeX - character.w && characterX < snake.x + snake.width) {
+                        game.ep -= 1;
+                        if(game.ep<=0){
+                            game.lives--;
+                            stop();}
+                    }
+                }
+                if (c >= 80) {
+                    // CHECK FOR THE SAME HORIZONTAL POSITION 
+                    if (characterX > snakeX - character.w && characterX < snake.x + snake5.width) {
+                        game.ep -= 1;
+                        if(game.ep<=0){
+                            game.lives-=2;
+                            stop();}
+                    }
+                }
+            }
+        }
+
+
 
     }
 }
@@ -778,6 +823,7 @@ function run() {
             snakes.createSnake();
             snakes.updateSnakes();
             snakes.checkForSnakeBites();
+            game.displayEp();
 
             // create and update  and collect Bananas
 
