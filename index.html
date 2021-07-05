@@ -1,55 +1,79 @@
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
 
-    <link rel="stylesheet" href="./style.css">
-</head>
-<body>
-    
-    
-<div class="canvaswrapper">
-    <h4>Der lausige Affe!</h4>
-    <h4 id='points'>Points:</h4>
-    <h4 id='level'>Level 1</h4>
-    <canvas id="canvas" width="400" height="600"></canvas> <!-- width=400 height=600-->
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="gamewrapper">
+      <div class="canvaswrapper">
+        <div class="data">
+          <h2 id="level">Level 1</h2>
+          <h2 id="points">Points: 0</h2>
+          <div id="highscore">
+            <h2>Highscore:</h2>
+            <table id="highscoretable">
+                <thead>
+                 <tr class="playerclone">
+                  <td class="name">
+                    <span>Gabriel</span>
+                  </td>
+                  <td class="points"><span>123</span></td>
+                </tr>  
+                
+                </thead>
+              <tbody>
+                
+                
+              </tbody>
+              <tfoot>
+                <tr id="create-player">
+                    <td>
+                      <input type="text" placeholder="enter your name and start!" />
+                    </td>
+  
+                    <td>
+                      <button id="createplayer" class="btn">enter</button>
+                    </td>
+                  </tr> 
+              </tfoot>
+            </table>
+          </div>
+        </div>
+        <div class="game">
+          <canvas id="canvas" width="400" height="600"></canvas>
+          <!-- width=400 height=600-->
 
-    <img id="character"src="./images/monkey.png" alt="">
-    <img id="background"src="./images/background cut.png" alt="">
-    <img id='banana'src="./images/banana.png" alt="">
-    <img id='beer'src="./images/beer.png" alt="">
-    <img id='lives'src="./images/lives.png" alt="">
-    <img id='start'src="./images/start.png" alt="">
-    <img id='countdown1'src="./images/countdown1.png" alt="">
-    <img id='countdown2'src="./images/countdown2.png" alt="">
-    <img id='countdown3'src="./images/countdown3.png" alt="">
-    <img id='jump'src="./images/jump.png" alt="">
-    <img id='gameover'src="./images/gameover.png" alt="">
-    <img id='stage1'src="./images/stage1.png" alt="">
-    <img id='stage2'src="./images/stage2.png" alt="">
-    <img id='stage3'src="./images/stage3.png" alt="">
-    <img id='snake1'src="./images/snake1.png" alt="">
-    <img id='snake2'src="./images/snake2.png" alt="">
-    <img id='snake3'src="./images/snake3.png" alt="">
-    <img id='snake4'src="./images/snake4.png" alt="">
-    <img id='snake5'src="./images/snake5.png" alt="">
-    
-    
-    <div class="btnwrapper">
-    
+          <img id="character" src="./images/monkey.png" alt="" />
+          <img id="background" src="./images/background cut.png" alt="" />
+          <img id="banana" src="./images/banana.png" alt="" />
+          <img id="beer" src="./images/beer.png" alt="" />
+          <img id="lives" src="./images/lives.png" alt="" />
+          <img id="start" src="./images/start.png" alt="" />
+          <img id="countdown1" src="./images/countdown1.png" alt="" />
+          <img id="countdown2" src="./images/countdown2.png" alt="" />
+          <img id="countdown3" src="./images/countdown3.png" alt="" />
+          <img id="jump" src="./images/jump.png" alt="" />
+          <img id="gameover" src="./images/gameover.png" alt="" />
+          <img id="stage1" src="./images/stage1.png" alt="" />
+          <img id="stage2" src="./images/stage2.png" alt="" />
+          <img id="stage3" src="./images/stage3.png" alt="" />
+          <img id="snake1" src="./images/snake1.png" alt="" />
+          <img id="snake2" src="./images/snake2.png" alt="" />
+          <img id="snake3" src="./images/snake3.png" alt="" />
+          <img id="snake4" src="./images/snake4.png" alt="" />
+          <img id="snake5" src="./images/snake5.png" alt="" />
 
-
-   
-    <img id='keys'src="./images/keys.png" alt="">
-
-</div>
-</div>
-
-
-
+          <div class="btnwrapper">
+            <img id="keys" src="./images/keys.png" alt="" />
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script src="./index.js"></script>
-</body>
+  </body>
 </html>

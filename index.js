@@ -24,6 +24,7 @@ const snake3 = document.getElementById('snake3');
 const snake4 = document.getElementById('snake4');
 const snake5 = document.getElementById('snake5');
 
+const createPlayer = document.getElementById('createplayer')
 
 // the canvas
 const canvas = document.getElementById('canvas');
@@ -185,6 +186,7 @@ let game = {
 
             })
         }
+
     },
 
     updateLevel: function () {
@@ -243,7 +245,7 @@ let game = {
         this.gameoverStatus = false;
         snakes.snakeList = [];
         snakes.snakeCounter = 0;
-        this.ep=100;
+        this.ep = 100;
 
 
     },
@@ -355,7 +357,149 @@ let character = {
 
     }
 
+};
+
+// HIGHSCORE OBJECT 
+let playerObj = {
+    highscoreList: [
+        {
+            name: 'Alexand3r the not so tall one',
+            points: 489
+        },
+        {
+            name: 'Brandon Boyd',
+            points: 987
+        },
+        {
+            name: 'David Gilmour',
+            points: 1299
+        },
+        {
+            name: 'Matthew McKonnahue',
+            points: 999
+        },
+        {
+            name: 'MonkeyMan491',
+            points: 1273
+        },
+        {
+            name: 'Bonnie',
+            points: 720
+        },
+        {
+            name: 'Live Laugh Love',
+            points: 8
+        },
+        {
+            name: 'Dr.Dre',
+            points: 420
+        },
+        {
+            name: 'Banananana',
+            points: 618
+        },
+        {
+            name: 'Ronald McDonald',
+            points: 123
+        },
+        {
+            name: 'Tell me where is Gandalf!',
+            points: 743
+        },
+        {
+            name: 'Huckleberry Finn',
+            points: 500
+        },
+        {
+            name: 'Tom Toyota',
+            points: 147
+        },
+        {
+            name: 'Audre Lorde',
+            points: 2247
+        }
+
+    ],
+    shuffledHighscoreList: [],
+    shuffledOrderedHighscoreList: [],
+    userName: '',
+    shuffle: function () {
+        let copiedArr = this.highscoreList.slice();
+        let shuffledArr = [];
+        function shuffle() { return Math.floor(Math.random() * copiedArr.length) }
+        for (let i = 0; i < 14; i++) {
+            let x = shuffle();
+            shuffledArr.push(copiedArr[x])
+            copiedArr.splice(x, 1, copiedArr[copiedArr.length - 1])
+            copiedArr.pop();
+        }
+        this.shuffledHighscoreList = shuffledArr.slice(0, 6);
+
+
+    },
+    orderByPoints: function (arr) {
+
+        let orderedArr = arr.sort(function (a, b) {
+            if (a.points > b.points) return -1;
+            if (a.points < b.points) return 1;
+            if (a.points === b.points) { return 0 }
+        }
+        )
+        this.shuffledOrderedHighscoreList = orderedArr;
+
+    },
+    enterName: function () {
+        let playerName = document.querySelector("#create-player td input").value;
+        this.userName = playerName;
+        let player = {
+            name: this.userName,
+            points: game.points
+        }
+        playerObj.shuffledHighscoreList.push(player);
+        playerObj.orderByPoints(playerObj.shuffledHighscoreList);
+        console.log(playerObj.shuffledOrderedHighscoreList)
+
+
+    },
+    displayStart: function () {
+
+        let parent = document.querySelector("#highscoretable tbody");
+        for (let i = 0; i < playerObj.shuffledOrderedHighscoreList.length; i++) {
+            let rowToClone = document.querySelector(".playerclone");
+            let clonedRow = rowToClone.cloneNode(true);
+            clonedRow.setAttribute('class', '')
+            clonedRow.querySelector('.name').innerHTML = playerObj.shuffledOrderedHighscoreList[i].name;
+            clonedRow.querySelector('.points').innerHTML = playerObj.shuffledOrderedHighscoreList[i].points;
+            parent.appendChild(clonedRow);
+
+        }
+    },
+
+    displayHighscore: function () {
+
+
+        let parent = document.querySelector("#highscoretable tbody");
+        parent.innerHTML = ''
+        document.querySelector('#highscoretable tfoot').innerHTML = '';
+        for (let i = 0; i < playerObj.shuffledOrderedHighscoreList.length; i++) {
+            let rowToClone = document.querySelector(".playerclone");
+            let clonedRow = rowToClone.cloneNode(true);
+            clonedRow.setAttribute('class', '')
+            clonedRow.querySelector('.name').innerHTML = playerObj.shuffledOrderedHighscoreList[i].name;
+            clonedRow.querySelector('.points').innerHTML = playerObj.shuffledOrderedHighscoreList[i].points;
+            parent.appendChild(clonedRow);
+
+        }
+
+    },
+    updateHighscore: function () {
+        let parent = document.querySelector("#highscoretable tbody")
+        let user = parent.querySelectorAll('tr .points');
+        let userPoints = user[(user.length) - 1].innerHTML = game.points;
+    }
+
 }
+
 
 
 // the background
@@ -472,18 +616,21 @@ let snakes = {
                     // CHECK FOR THE SAME HORIZONTAL POSITION 
                     if (characterX > snakeX - character.w && characterX < snake.x + snake.width) {
                         game.ep -= 1;
-                        if(game.ep<=0){
-                            game.lives--;
-                            stop();}
+                        if (game.ep <= 0) {
+                            console.log('got bitten gonna substract 1 life!')
+
+                            stop();
+                        }
                     }
                 }
                 if (c >= 80) {
                     // CHECK FOR THE SAME HORIZONTAL POSITION 
                     if (characterX > snakeX - character.w && characterX < snake.x + snake5.width) {
-                        game.ep -= 1;
-                        if(game.ep<=0){
-                            game.lives-=2;
-                            stop();}
+                        game.ep -= 3;
+                        if (game.ep <= 0) {
+
+                            stop();
+                        }
                     }
                 }
             }
@@ -841,6 +988,11 @@ function run() {
             game.updateLevel();
             game.checkForActions();
 
+            // DISPLAY THE PLAYERS POINTS! 
+
+
+            playerObj.updateHighscore();
+
             if (character.jumpButton) {
                 character.jump()
             };
@@ -916,7 +1068,9 @@ document.addEventListener('keypress', function (event) {
 
     }
     if (event.keyCode == 32) {
-        event.preventDefault()
+        if (game.running === true) {
+            event.preventDefault()
+        }
     }
 })
 
@@ -924,12 +1078,23 @@ document.addEventListener('keypress', function (event) {
 
 
 
-// I didnt check out the "onload" function of JS, so I used a timeout to draw the beginning 
+// I didnt check out the "onload" function of JS, so I used a timeout to draw the beginning
+
+// Add event listeners to the ENTER BTN  
+createPlayer.addEventListener('click', playerObj.enterName)
+createPlayer.addEventListener('click', playerObj.displayHighscore)
 
 let def = setTimeout(() => {
     canvasObj.draw()
     game.displayStart();
     character.draw();
     game.displayLives();
+
+    // Shuffle, Order and display the HighScore!
+    playerObj.shuffle();
+    playerObj.orderByPoints(playerObj.shuffledHighscoreList);
+    playerObj.displayStart();
+
+
 
 }, 300)
