@@ -43,7 +43,7 @@ let game = {
 
     level: 1,
     levelSpeed: 19,  /// BEEN WORKING ON CHANGING THE JUMPING SPEED BY REFERENCING A GAME "LEVELSPEED"!
-    levelAccileration: 0.4,
+    levelAccileration: 0.7,
     levelStageModulo: 35,
     drunkness: 0,
     points: 0,
@@ -193,26 +193,26 @@ let game = {
         if (this.points > 250) {
             this.gameSpeed = 3.0;
             this.levelSpeed = 21;
-            this.levelAccileration = 0.5;
+            this.levelAccileration = 0.7;
             this.level = 2;
 
         }
         if (this.points > 400) {
             this.gameSpeed = 3.5;
             this.levelSpeed = 21;
-            this.levelAccileration = 0.6;
+            this.levelAccileration = 0.7;
             this.level = 3;
         }
         if (this.points > 550) {
             this.gameSpeed = 4.5;
             this.levelSpeed = 23;
             this.levelAccileration = 0.7;
-            this.levelStageModulo = 28;
+            this.levelStageModulo = 22;
             this.level = 4;
         }
         if (this.points > 650) {
             this.gameSpeed = 5.5;
-            this.levelSpeed = 24;
+            this.levelSpeed = 22.5;
             this.levelAccileration = 0.9;
             this.levelStageModulo = 15;
             this.level = 5;
@@ -246,6 +246,7 @@ let game = {
         snakes.snakeList = [];
         snakes.snakeCounter = 0;
         this.ep = 100;
+        this.drunkness=0;
 
 
     },
@@ -276,7 +277,7 @@ let character = {
     x: (canvas.width / 2) - 25,
     y: canvas.height - 60,
     jumpCounter: 0,
-    acceleration: 0.7,
+    acceleration: game.levelAccileration,
     upSpeed: game.levelSpeed,
     canvasSpeed: game.gameSpeed,
     jumpButton: false,
@@ -304,14 +305,14 @@ let character = {
         if (game.drunkenRandomizer < 5 && this.x + game.drunkness < canvas.width - character.w) {
             if (this.x + game.drunkness < canvas.width - character.w) {
 
-                this.x += (game.drunkness / 20);
+                this.x += (game.drunkness / 10);
             }
 
         }
         if (game.drunkenRandomizer > 5 && this.x + game.drunkness < canvas.width - character.w) {
             if (this.x - game.drunkness > 0) {
 
-                this.x -= (game.drunkness / 20);
+                this.x -= (game.drunkness / 10);
             }
 
         }
@@ -322,7 +323,7 @@ let character = {
 
             this.jumpButton = false;
             this.jumpCounter = 0;
-            this.acceleration = 0.7;
+            this.acceleration = game.levelAccileration;
             this.upSpeed = game.levelSpeed;
             this.downMovement = true;
 
@@ -423,6 +424,8 @@ let playerObj = {
     shuffledHighscoreList: [],
     shuffledOrderedHighscoreList: [],
     userName: '',
+    updateHighscoreCounter:0,
+    setName:false,
     shuffle: function () {
         let copiedArr = this.highscoreList.slice();
         let shuffledArr = [];
@@ -453,11 +456,13 @@ let playerObj = {
         this.userName = playerName;
         let player = {
             name: this.userName,
-            points: game.points
+            points: game.points,
+            user: 'user'
         }
         playerObj.shuffledHighscoreList.push(player);
         playerObj.orderByPoints(playerObj.shuffledHighscoreList);
-        console.log(playerObj.shuffledOrderedHighscoreList)
+        playerObj.setName=true;
+
 
 
     },
@@ -493,9 +498,26 @@ let playerObj = {
 
     },
     updateHighscore: function () {
-        let parent = document.querySelector("#highscoretable tbody")
-        let user = parent.querySelectorAll('tr .points');
-        let userPoints = user[(user.length) - 1].innerHTML = game.points;
+        for (let i = 0; i < playerObj.shuffledOrderedHighscoreList.length; i++) {
+            if (this.shuffledOrderedHighscoreList[i].user === 'user') {
+                this.shuffledOrderedHighscoreList[i].points=game.points;
+            }
+        };
+        playerObj.orderByPoints(this.shuffledOrderedHighscoreList);
+
+        let parent = document.querySelector("#highscoretable tbody");
+        parent.innerHTML = ''
+        document.querySelector('#highscoretable tfoot').innerHTML = '';
+        for (let i = 0; i < playerObj.shuffledOrderedHighscoreList.length; i++) {
+            let rowToClone = document.querySelector(".playerclone");
+            let clonedRow = rowToClone.cloneNode(true);
+            clonedRow.setAttribute('class', '')
+            clonedRow.querySelector('.name').innerHTML = playerObj.shuffledOrderedHighscoreList[i].name;
+            clonedRow.querySelector('.points').innerHTML = playerObj.shuffledOrderedHighscoreList[i].points;
+            parent.appendChild(clonedRow);
+
+        }
+
     }
 
 }
@@ -991,7 +1013,11 @@ function run() {
             // DISPLAY THE PLAYERS POINTS! 
 
 
-            playerObj.updateHighscore();
+            // playerObj.updateHighscore();
+            playerObj.updateHighscoreCounter+=1;
+            if(playerObj.updateHighscoreCounter%60===0){
+                playerObj.updateHighscore();
+            }
 
             if (character.jumpButton) {
                 character.jump()
@@ -1062,7 +1088,7 @@ document.addEventListener('keydown', event => {
 
 document.addEventListener('keypress', function (event) {
     if (event.keyCode == 13) {
-        if (game.gameoverStatus === false) {
+        if (game.gameoverStatus === false&&playerObj.setName===true) {
             run();
         }
 
